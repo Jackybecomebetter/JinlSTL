@@ -8,7 +8,7 @@
 namespace Jinl
 {
 	template<class T1,class T2>
-	inline void construc(T1* ptr, const T2& value)
+	inline void construct(T1* ptr, const T2& value)
 	{
 		new(ptr) T1(value);
 	}

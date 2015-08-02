@@ -75,7 +75,7 @@ namespace Jinl
 	}
 	inline wchar_t* uninitialized_copy(const wchar_t* first, const wchar_t* last, wchar_t* result)
 	{
-		memmove(result, first,sizeof(wchar_t)* last - first);
+		memmove(result, first,sizeof(wchar_t)* (last - first));
 		return result + (last - first);
 	}
 
