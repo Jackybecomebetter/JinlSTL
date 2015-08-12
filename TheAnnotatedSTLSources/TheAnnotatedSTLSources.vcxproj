@@ -88,6 +88,7 @@
     <ClInclude Include="allocator.h" />
     <ClInclude Include="construct.h" />
     <ClInclude Include="Iterator.h" />
+    <ClInclude Include="set.h" />
     <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="uninitialized.h" />
     <ClInclude Include="Vector.h" />
