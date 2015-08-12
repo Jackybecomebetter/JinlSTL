@@ -81,15 +81,28 @@
     <ClCompile Include="Alloc.cpp" />
     <ClCompile Include="autoptr.cpp" />
     <ClCompile Include="config-inclass-init.cpp" />
+    <ClCompile Include="deque.impl.cpp" />
+    <ClCompile Include="List.imp.cpp" />
+    <ClCompile Include="stack.impl.cpp" />
     <ClCompile Include="Vector.imp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alloc.h" />
     <ClInclude Include="allocator.h" />
     <ClInclude Include="construct.h" />
+    <ClInclude Include="deque.h" />
+    <ClInclude Include="heap.h" />
     <ClInclude Include="Iterator.h" />
+    <ClInclude Include="list.h" />
+    <ClInclude Include="priority_queue.h" />
+    <ClInclude Include="queue.h" />
+    <ClInclude Include="RBTree.h" />
+    <ClInclude Include="ReverseIterator.h" />
+    <ClInclude Include="slist.h" />
+    <ClInclude Include="stack.h" />
     <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="uninitialized.h" />
+    <ClInclude Include="Utility.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
