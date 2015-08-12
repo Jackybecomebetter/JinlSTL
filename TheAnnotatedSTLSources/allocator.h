@@ -1,7 +1,7 @@
 #ifndef _ALLOCATOR_H_
 #define _ALLOCATOR_H_
 
-#include "alloc.h"
+#include "Alloc.h"
 #include "construct.h"
 
 #include <cassert>
