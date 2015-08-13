@@ -131,6 +131,30 @@ namespace Jinl{
 		}
 
 	};
+
+	inline bool operator==(const rb_tree_base_iterator& x, const rb_tree_base_iterator& y){
+		return x.node == y.node;
+	}
+	inline bool operator!=(const rb_tree_base_iterator& x, const rb_tree_base_iterator& y){
+		return !(x == y);
+	}
+
+	inline BidirectionIterator_tag
+		iterator_category(const rb_tree_base_iterator&){
+		return BidirectionIterator_tag();
+	}
+	inline rb_tree_base_iterator::difference_type* 
+		distance_type(const rb_tree_base_iterator&){
+		return (rb_tree_base_iterator::difference_type *)0;
+	}
+
+	template <class T,class Ref,class Ptr>
+	inline value_type* value_type(const rb_tree_iterator<T, Ref, Ptr>&){
+		return (value_type*)0;
+	}
+
+
+
 	template<class Key, class Value, class KeyOfValue, class Compare>
 	class rbTree{
 	protected:
@@ -273,6 +297,15 @@ namespace Jinl{
 			putNode(header);
 		}
 
+		void clear(){
+			if (node_count == 0){
+				erase(root());
+				leftmost() = header;
+				root() = nullptr;
+				rightmost() = header;
+				node_count = 0;
+			}
+		}
 		rbTree<Key, Value, KeyOfValue, Compare>&
 			operator=(const rbTree<Key, Value, KeyOfValue, Compare>& x);
 
@@ -298,6 +331,72 @@ namespace Jinl{
 		}
 
 	public:
+		template<class InputIterator>
+		void insert_unique(InputIterator first, InputIterator last){
+			for (; first != last; first++)
+				insert_unique(*first);
+		}
+		size_type count(const key_type &x) const{
+			pair<const_iterator, const_iterator> p = equal_range(k);
+			size_type n = 0;
+			distance(p.first, p.second, n);
+			return n;
+		}
+		iterator lower_bound(const key_type &k){
+			link_type y = header;
+			link_type x = root();
+			while (x != nullptr)
+				if (key_comp(key(x), k))
+					y = x; x = left(x);
+				else
+					x = right(x);
+
+			return iterator(y);
+		}
+		const_iterator lower_bound(const key_type &k) const{
+			link_type y = header;
+			link_type x = root();
+			while (x != nullptr)
+				if (key_comp(key(x), k))
+					y = x; x = left(x);
+				else
+					x = right(x);
+
+			return iterator(y);
+		}
+		iterator upper_bound(const key_type &k){
+			link_type y = header;
+			link_type x = root();
+			while (x != nullptr)
+				if (key_comp(k, key(x)))
+					y = x, x = left(x);
+				else
+					x = right(x);
+			return iterator(y);
+		}
+		const_iterator upper_bound(const key_type &k) const{
+			link_type y = header;
+			link_type x = root();
+			while (x != nullptr)
+				if (key_comp(k, key(x)))
+					y = x, x = left(x);
+				else
+					x = right(x);
+			return iterator(y);
+		}
+
+		inline pair<const_iterator, const_iterator>::equal_range(const key& k) const {
+			return pair<const_iterator, const_iterator>(lower_bound(k), upper_bound(k));
+		}
+
+		inline void erase(iterator position){
+			link_type y = (link_type)rb_tree_rebalance_for_erase(
+				position->node, header->parent, header->lchild, header->rchild);
+			destroyNode(y);
+			--node_count;
+		}
+		
+
 		pair<iterator, bool> insert_unique(const value_type& val){
 			link_type y = header;
 			link_type x = root();
@@ -381,6 +480,137 @@ namespace Jinl{
 		return iterator(z);
 
 	}
+	inline rb_tree_node_base* rb_tree_rebalance_for_erase(
+		rb_tree_node_base* x, rb_tree_node_base*& root,
+		rb_tree_node_base*& leftmost, rb_tree_node_base*& rightmost){
+
+		rb_tree_node_base* y = x;
+		rb_tree_node_base* z = nullptr;
+		rb_tree_node_base* z_parent = nullptr;
+		if (y->lchild == nullptr)
+			z = y->rchild;
+		else if (y->rchild == nullptr)
+			z = y->lchild;
+		else{
+			y = y->rchild;
+			while (y->lchild != nullptr)
+				y = y->lchild;
+			z = y->rchild;
+		}
+		if (y != x){
+			x->lchild->parent = y;
+			y->lchild = z->lchild;
+			if (y != x->rchild)
+			{
+				z_parent = y->parent;
+				if (z)
+					z->parent = y->parent;
+				y->parent->lchild = z;
+				y->rchild = x->rchild;
+				x->rchild->parent = y;
+			}
+			else
+				z->parent = y;
+			if (root = x)
+				root = y;
+			else if (x->parent->lchild == z)
+				x->parent->lchild = y;
+			else
+				x->parent->rchild = y;
+			y->parent = x->parent;
+			swap(y->color, x->color);
+			y = x;
+		}
+		else {
+			//y == x
+			z_parent = y->parent;
+			if (z)
+				z->parent = y->parent;
+			if (root == x)
+				root = z;
+			else if (x->parent->lchild == x)
+				x->parent->lchild = z;
+			else
+				x->parent->rchild = z;
+			if (leftmost == x)
+				if (x->rchild == nullptr)
+					leftmost = x->parent;
+				else
+					leftmost = rb_tree_node_base::minimum(z);
+			if (rightmost == x)
+				if (x->lchild == nullptr)
+					rightmost = x->parent;
+				else rightmost = rb_tree_node_base::maximum(z);
+		}
+
+		if (y->color != rb_tree_red){
+			while (z != root && (z == nullptr || z->color == rb_tree_black)){
+				if (z == z_parent->lchild){
+					rb_tree_node_base* w = z_parent->rchild;
+					if (w->color == rb_tree_red){
+						w->color = rb_tree_black;
+						z_parent->color = rb_tree_red;
+						rb_tree_rotate_left(z_parent, root);
+						w = z_parent->rchild;
+					}
+					if ((w->lchild == nullptr || w->lchild->color == rb_tree_black) &&
+						(w->rchild == nullptr || w->rchild->color == rb_tree_black)){
+						w->rchild->color = rb_tree_red;
+						z = z_parent;
+						z_parent = z_parent->parent;
+					} else {
+						if (w->rchild == 0 || w->rchild->color == rb_tree_black)
+							if (w->lchild)
+								w->lchild->color = rb_tree_black;
+						w->color = rb_tree_red;
+						rb_tree_rotate_right(w, root);
+						w = z_parent->rchild;
+					}
+					w->color = z_parent->color;
+					z->parent->color = rb_tree_black;
+					if (w->rchild)
+						w->rchild->color = rb_tree_black;
+					rb_tree_rotate_left(z_parent, root);
+					break;
+				}
+				else{
+					rb_tree_node_base* w = z_parent->lchild;
+					if (w->color == rb_tree_red){
+						w->color = rb_tree_black;
+						z_parent->color = rb_tree_red;
+						rb_tree_rotate_right(z_parent, root);
+						w = z_parent->lchild;
+					}
+					if ((w->rchild == nullptr || w->rchild->color == rb_tree_black) &&
+						(w->lchild == nullptr || w->lchild->color == rb_tree_black)){
+						w->color = rb_tree_red;
+						z = z_parent;
+						z_parent = z_parent->parent;
+
+					}
+					else{
+						if (w->lchild == nullptr || w->lchild->color == rb_tree_black){
+							if (w->rchild)
+								w->rchild->color = rb_tree_black;
+							w->color = rb_tree_red;
+							rb_tree_rotate_left(w, root);
+							w = z_parent->lchild;
+						}
+						w->color = z_parent->color;
+						z_parent->color = rb_tree_black;
+						if (w->lchild)
+							w->lchild->color = rb_tree_black;
+						rb_tree_rotate_right(z_parent, root);
+						break;
+					}
+				}
+				if (z)
+					z->color = rb_tree_black;
+			}
+		}
+		return y;
+		
+	}
 	inline void rb_tree_balance(rb_tree_node_base* x, rb_tree_node_base*& root){
 		x->color = rb_tree_red;
 		while (x != root&&x->parent->color == rb_tree_red)
@@ -461,6 +691,7 @@ namespace Jinl{
 		y->rchild = x;
 		x->parent = y;
 	}
+
 
 
 
