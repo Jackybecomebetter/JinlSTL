@@ -18,16 +18,9 @@ namespace Jinl{
 		T1 first;
 		T2 second;
 
-		pair(){}
+		pair():first(T1()),second(T2()){}
+		pair(const T1& a, const T2& b) :first(a), second(b){}
 	};
-
-
-
-
-
-
-
-
 }
 
 #endif
