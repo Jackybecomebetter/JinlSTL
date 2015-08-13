@@ -336,6 +336,34 @@ namespace Jinl{
 			for (; first != last; first++)
 				insert_unique(*first);
 		}
+
+		iterator insert_unique(iterator position, const value_type& val){
+			if (position->node == header->lchild){
+				if (size() > 0 && key_comp(KeyOfValue()(val), key(position->node)))
+					return insert(position->node, position->node, val);
+				else
+					return insert_unique(val).first;
+			}
+			else if (position->node = header){
+				if (key_comp(key(rightmost(), KeyOfValue()(val))))
+					return insert(0, rightmost(), val);
+				else return insert_unique(val).first;
+			}
+			else{
+				iterator before = position;
+				--before;
+				if (key_comp(key(before->node), KeyOfValue()(val)) &&
+					key_comp(KeyOfValue()(val), key(position->node))){
+					if (right(before->node) == nullptr)
+						return _insert(0, before->node, val);
+					else
+						return _insert(position->node, position->node, val);
+				}
+				else
+					return insert_unique(val).first;
+			}
+		}
+
 		size_type count(const key_type &x) const{
 			pair<const_iterator, const_iterator> p = equal_range(k);
 			size_type n = 0;
@@ -692,7 +720,38 @@ namespace Jinl{
 		x->parent = y;
 	}
 
+	template<class Key, class Value, class KeyOfValue, class Compare>
+	typename rbTree<Key, Value, KeyOfValue, Compare>::iterator
+		rbTree<Key, Value, KeyOfValue, Compare>::_insert(base_ptr x_, base_ptr y_, const value_type& v){
+		link_type x = (link_type)x_;
+		link_type y = (link_type)y_;
+		link_type z;
 
+		if (y == header || x != nullptr ||
+			key_comp(KeyOfValue()(v), key(y))){
+			z = createNode(v);
+			left(y) = z;
+
+			if (y == header){
+				root() = z;
+				rightmost() = z;
+			}
+			else if (y == leftmost())
+				leftmost() = z;
+		}
+		else{
+			z = createNode(v);
+			right(y) = z;
+			if (y == rightmost())
+				rightmost() = z;
+		}
+		parent(z) = y;
+		left(z) = nullptr;
+		right(z) = nullptr;
+		rb_tree_balance(z, header->parent);
+		++node_count;
+		return iterator(z);
+	}
 
 
 }
