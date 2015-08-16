@@ -32,8 +32,7 @@ namespace Jinl{
 		const T& value){
 		return _lower_bound(first, last, value, distance_type(first), iterator_category(first));
 	}
-	
-
+	;
 }
 
 #endif

@@ -104,5 +104,17 @@
     <ClInclude Include="algo.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="HashFunction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="function.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="algobase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

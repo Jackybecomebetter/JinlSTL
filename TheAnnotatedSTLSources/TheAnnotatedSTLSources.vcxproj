@@ -92,10 +92,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="algo.h" />
+    <ClInclude Include="algobase.h" />
+    <ClInclude Include="algorithm.h" />
     <ClInclude Include="alloc.h" />
     <ClInclude Include="allocator.h" />
     <ClInclude Include="construct.h" />
     <ClInclude Include="deque.h" />
+    <ClInclude Include="function.h" />
+    <ClInclude Include="HashFunction.h" />
     <ClInclude Include="hashtable.h" />
     <ClInclude Include="heap.h" />
     <ClInclude Include="Iterator.h" />
