@@ -91,6 +91,7 @@
     <ClCompile Include="Vector.imp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="algo.h" />
     <ClInclude Include="alloc.h" />
     <ClInclude Include="allocator.h" />
     <ClInclude Include="construct.h" />
@@ -100,6 +101,7 @@
     <ClInclude Include="Iterator.h" />
     <ClInclude Include="list.h" />
     <ClInclude Include="map.h" />
+    <ClInclude Include="numeric.h" />
     <ClInclude Include="priority_queue.h" />
     <ClInclude Include="queue.h" />
     <ClInclude Include="RBTree.h" />

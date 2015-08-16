@@ -98,5 +98,11 @@
     <ClInclude Include="hashtable.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="numeric.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="algo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

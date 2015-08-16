@@ -181,7 +181,19 @@ namespace Jinl
 		}
 
 
-		
+		template<class T, class alloc>
+		void vector<T, alloc>::reserve(size_type n){
+			if (n <= capacity())
+				return;
+			T *newStart = dataAllocator::allocate(n);
+			T *newFinish = uninitialized_copy(begin(), end(), newStart);
+			dataAllocator::destroy(start, finish);
+			dataAllocator::deallocate(start, capacity());
+
+			start= newStart;
+			finish= newFinish;
+			endOfStorage = start_ + n;
+		}
 
 
 
