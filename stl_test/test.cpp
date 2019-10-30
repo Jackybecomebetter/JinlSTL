@@ -92,13 +92,133 @@ long * pItem = (long*)bsearch(&target, (c.data()), ASIZE , sizeof(long),compreLo
 
 }
 
+#include<vector>
+#include<stdexcept>
+#include<string>
+#include<cstdlib>
+#include<cstdio>
+#include<iostream>
+#include<ctime>
+#include<algorithm>
+
+// 测试vector插入、查找和排序
 namespace hlx02
 {
-    
+
+void test_vector(long value)
+{
+    cout << "start to test vector "<< endl;
+
+vector<string> c;
+char buf[10];
+
+clock_t timestart = clock();
+    for(long i=0 ; i < value ; ++i)
+    {
+        try
+        {
+            snprintf(buf,10,"%d",rand() / 100000);
+            c.push_back(buf);
+        }
+        // 如果内存不够的话，可以检测到push哪个的时候发生错误
+        catch(exception &p)
+        {
+            cout << "i = " << i << " " << p.what() << endl;
+            abort();
+        }
+    }
+    cout << "milli-seconds " << (clock() - timestart) * 1000.00 / CLOCKS_PER_SEC  << endl;
+    cout << "vector.size() = " << c.size() << endl;
+    cout << "vector.front() = " << c.front() << endl;
+    cout << "vector.back() = " << c.back() << endl;
+    cout << "vector.data() = " << c.data() << endl;
+    cout << "vector.capacity() = " << c.capacity() << endl;
+
+string target = get_a_target_string();
+    {
+timestart = clock();
+auto pItem = ::find(c.begin(),c.end(),target);
+    cout << "::find(), milli-seconds: " << (clock() - timestart) * 1000.00 / CLOCKS_PER_SEC  << endl;
+
+    if(pItem != c.end())
+        cout  << "found " << *pItem << endl;
+    else
+        cout << "not found" << endl;
+    }
+    {
+    timestart = clock();
+    sort(c.begin(),c.end());
+string *pItem = (string*)bsearch(&target,(c.data()),c.size(),sizeof(string),compareStrings);
+    cout << "sort then bsearch cost milli-seconds : " << (clock() - timestart) * 1000.00 / CLOCKS_PER_SEC << endl;
+
+    if(pItem != NULL)
+        cout << "found " << *pItem << endl;
+    else
+        cout << "not found" << endl;
+    }
+
+}
+
+}
+
+// 测试list的查找和排序
+#include<list>
+namespace hlx03
+{
+
+void test_list(long value)
+{
+    cout << "start to test list "<< endl;
+
+list<string> c;
+char buf[10];
+
+clock_t timestart = clock();
+    for(long i=0 ; i < value ; ++i)
+    {
+        try
+        {
+            snprintf(buf,10,"%d",rand() / 100000);
+            c.push_back(buf);
+        }
+        // 如果内存不够的话，可以检测到push哪个的时候发生错误
+        catch(exception &p)
+        {
+            cout << "i = " << i << " " << p.what() << endl;
+            abort();
+        }
+    }
+    cout << "milli-seconds " << (clock() - timestart) * 1000.00 / CLOCKS_PER_SEC  << endl;
+    cout << "list.size() = " << c.size() << endl;
+    cout << "list.maxsize() = " << c.max_size() << endl;
+    cout << "list.front() = " << c.front() << endl;
+    cout << "list.back() = " << c.back() << endl;
+
+string target = get_a_target_string();
+    {
+timestart = clock();
+auto pItem = ::find(c.begin(),c.end(),target);
+    cout << "::find(), milli-seconds: " << (clock() - timestart) * 1000.00 / CLOCKS_PER_SEC  << endl;
+
+    if(pItem != c.end())
+        cout  << "found " << *pItem << endl;
+    else
+        cout << "not found" << endl;
+    }
+    {
+    timestart = clock();
+    c.sort();
+    cout << "sort cost milli-seconds : " << (clock() - timestart) * 1000.00 / CLOCKS_PER_SEC << endl;
+    }
+
+}
+
 }
 
 int main()
 {
     // test array
-    hlx01::test_array();
+    // hlx01::test_array();
+    // hlx02::test_vector(1000000);
+    hlx03::test_list(1000000);
 }
