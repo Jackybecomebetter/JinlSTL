@@ -2,6 +2,7 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
+#include <algorithm>
 using namespace std;
 
 #define ASIZE 500000

@@ -1,8 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+// #include <iostream>
+// #include <vector>
+// #include <algorithm>
 
+// using std::cout;
+// using std::endl;
 int main()
 {
+    
     int *p[5] = {0,0,0,0,0};
     int ** a;
     *p = (int *)malloc(sizeof(int));

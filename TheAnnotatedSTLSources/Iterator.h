@@ -29,7 +29,7 @@ namespace Jinl
 		typedef typename Iterator::reference          reference;
 	};
 
-	//Õë¶ÔÔ­ÉúÖ¸ÕëµÄÆ«ÌØ»¯°æ±¾
+	//ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Æ«ï¿½Ø»ï¿½ï¿½æ±¾
 	template <class T>
 	struct iterator_traits<T*>
 	{
@@ -39,7 +39,7 @@ namespace Jinl
 		typedef T&                                    reference;
 		typedef ptrdiff_t                             diffrence_type;
 	};
-	//Õë¶ÔÔ­Éú³£Ö¸ÕëµÄÆ«ÌØ»¯°æ±¾
+	//ï¿½ï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Æ«ï¿½Ø»ï¿½ï¿½æ±¾
 	template <class T>
 	struct iterator_traits<const T*>
 	{
@@ -99,6 +99,7 @@ namespace Jinl
 		return __distance(first, last, category());
 	}
 
+	// advance : è¿­ä»£å™¨ä»å½“å‰å¼€å§‹ï¼Œèµ°nçš„è·ç¦»
 	template <class InputIterator,class Distance>
 	inline void __advance(InputIterator& i, Distance n, InputIterator_tag)
 	{
