@@ -82,13 +82,192 @@ void set_node(map_pointer new_node)
 }
 ```
 
-以下是关于操作符重载
+以下是关于操作符重载(所有的操作符操作的是对象)
 
 ```cpp
-	
+reference operator *() const {return *cur;}
+pointer operator -> () const {return &(operator*());}	//不懂，需要细看
+// 重载“-”，用于计算两个iterator之间的距离
+difference_type operator-(const self &x) const{
+    return difference_type(buffer_size() * (node - x.node -1) + (cur - first) + (x.last - x.cur));
+}
+self & operator ++()
+{
+    ++cur;
+    if(cur == last)
+    {
+        set_node(node+1);
+        cur = first;
+    }
+    return *this;
+}
+self operator ++（int）
+{
+	self tmp = *this;
+	++*this;
+	return tmp;
+}
+self & operator --()
+{
+    if(cur == first)
+    {
+        set_node(node -1);
+        cur = last;
+    }
+    --cur;
+    return *this;
+}
+self operator-- (int)
+{
+    self tmp = *this;
+    --*this;
+    return tmp;
+}
+// 迭代器可以跨越n个距离
+self &operator +=(difference_type n)
+{
+    difference_type offse = n + (cur-first);	//计算跳跃之后，距离first的距离
+    if(offset >= 0 && offset <differenct_type(buffer_size()))	//目标在同一缓冲区
+        cur += n;
+    else	//目标不在同一缓冲区
+    {
+        difference_type node_offset = 
+            offset > 0 ? offset / difference_type(buffer_size()) :
+        	-difference_type((-offset-1) / buffer_size()) -1;
+        set_node(nod+node_offset);
+        cur = first + (offset - node_offset *difference_type(buffer_size()));
+    }
+    return *this;
+}
+self operator+(difference_type n) const
+{
+    self tmp = *this;
+    return tmp += n;
+}
+self& operator-=(difference_type n) const
+{
+    return *this += -n;
+}
+self operator- (difference_type n) const
+{
+    self tmp = *this;
+    return tmp -= n;
+}
+reference operator[](difference_type n) const
+{
+    return *(*this + n);//这个好像有问题
+}
+bool operator == (const self &x) {return this->cur == x.cur}
+bool operator != (const self &x) {return !(*this == x)}
+bool operator < (const self &x) const
+{
+    return (node == x.node) ? (cur < x.cur) : (node < x.node);
+}
 ```
 
+### 三、deque的数据结构、构造与内存管理ctor/push_back/pop_back
 
+#### 1、deque的数据结构
+
+​	deque维护start和finish两个迭代器，分别指向第一个缓冲区的第一个元素和最后一个缓冲区的最后一个元素；并且有一个指向map的指针（指向中控区），同时它还需要知道当前map的大小，一旦map大小不够，它需要分配更大的map
+
+```cpp
+template <class T,class Alloc=alloc,size_t BufSiz = 0>
+class deque
+{
+public:
+	typedef T value_type;
+	typedef value_type * pointer;
+	typedef size_t size_type;
+public:
+	typedef __deque_iterator<T ,T&,T*,BufSiz> iterator;
+protected:
+	typedef pointer * map_pointer;
+protected:
+	iterator start;
+    iterator finish;
+    map_pointer map;
+    size_type map_size;
+   ...
+  
+public:
+    iterator begin() {return start;}
+    iterator end() {return finish;}
+    reference operator[](size_type n)
+    {
+        return start[difference_type(n)];
+    }
+    reference front() {return *start}
+    reference back()
+    {
+        iterator tmp = finish;
+        --tmp;
+        return *tmp;
+    }
+    size_type size() const {return finish - start;}
+    size_type max_size() const {return size_tye(-1);}
+    bool empty() const (return finish == start;)
+}
+
+```
+
+#### 2、构造与内存管理ctor/push_back/pop_back
+
+```
+//deque构造函数
+deque(int n, const value_type & value) : start() ,finish(),map(0),map_size(0)
+{
+    fill_initialize(n,value);
+}
+// fill_initialize负责构造deque结构，并且初始化元素初值
+template <class T,class Alloc,size_t BufSize>
+void deque<T,Alloc,BufSize>::fill_initialize(size_type n,const value_type& value)
+{
+    create_map_and_nodes(n);	//创建map和node结构
+    map_pointer cur;
+    __STL_TRY{
+        for(cur = start.node; cur < finish.node; ++cur)
+        	uninitialized_fill(*cur,*cur+buffer_size(),value);
+        uninitialized_fill(finish.first,finish.cur,value);
+    }
+    catch(...)
+    {...}
+}
+// create_map_and_nodes(n)产生deque结构
+template<class T,class Alloc,size_t BufSize>
+void deque<T,Alloc,BufSize>::create_map_and_nodes(size_type num_elements)
+{
+    size_type num_nodes = num_elements / buffer_size() + 1;
+    map_size = max(initial_map_size() , num_nodes +2);
+    map = map_allocator::allocate(map_size);
+    map_pointer nstart = map + (map_size +num_nodes) / 2;
+    map_pointer nfinish = nstart +num_nodes - 1;
+    map_pointer cur;
+    
+    __STL_TRY
+    {
+        for(cur=nstart; cur < nfinish; ++cur)
+        	*cur = allocate_Node();
+    }
+	catch(...){...}
+	
+	start.set_node(nstart);
+	finish.set_node(nfinish);
+	start.cur = start.first;
+	finish.cur = finish.first + num_elements %buffer_siize();
+}
+```
+
+​	接下来的范例为每个元素赋初值，并且在为尾部插入三个新的元素，并且画出此时的deque的状态图
+
+```
+for(int i=0; i< ideq.size(); ++i)
+	ideq[i] = i;
+for(int i=0;i<3;i++)
+	ideq.push_back(i);
+```
+
+![](./picture/deque_3.JPG)
 
 #### 3、相的测试程序在仓库的stl_test里面，里面涉及到所有容器的测试。
 
